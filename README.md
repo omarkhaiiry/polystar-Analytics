@@ -31,3 +31,16 @@ The values below are the env var name with the default value in case of it is no
 
 ------------------------------------------
 
+###Websocket 
+you can connect on the websocket on  ws://localhost:8080/top-word-analytics 
+with body of { line: anytext }
+
+### HTTP
+Gets Top 5 words from local files
+http://localhost:8080/api/analytics/most-repeated-words?filesPaths=&topWordsCount=<5>
+  
+  
+#######Need to depoloy https://github.com/omarkhaiiry/polystar-publisher first  then you can use this api 
+http://localhost:8080/api/analytics/read-count?filesPaths=<textFilepath>,<AnotherTextFilePath>
+
+  
