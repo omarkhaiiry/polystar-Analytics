@@ -16,7 +16,6 @@ Analytics
 * Give the application any name you want
 * Choose the Main class for the app -> For this project it will be "com.polystar.analytics.AnalyticsApplication"
 * On "Use class module" select the application "Analytics"
-* Go for the Environment variable section and add SPRING_PROFILES_ACTIVE=local for local env
 
 ------------------------------------------
 
