@@ -24,22 +24,9 @@ public class AnalyticsService {
     }
 
     private volatile HashMap<String, Integer> repeatedWords = new HashMap<>();
-    private volatile HashMap<String, Integer> repeatedWordsConcat = new HashMap<>();
-    private volatile HashMap<String, Integer> repeatedWordsOneTimeConcat = new HashMap<>();
 
-    public LinkedHashMap<String, Integer> getRepeatedWordsConcat() {
 
-        return sortLinkedList(repeatedWordsConcat, 5);
-    }
 
-    public void setRepeatedWordsOneTimeConcat(HashMap<String, Integer> repeatedWordsOneTimeConcat) {
-        this.repeatedWordsOneTimeConcat = repeatedWordsOneTimeConcat;
-    }
-
-    public LinkedHashMap<String, Integer> repeatedWordsOneTimeConcat() {
-
-        return sortLinkedList(repeatedWordsOneTimeConcat, 5);
-    }
     public LinkedHashMap<String, Integer> topRepeatedCountWords(int topWordsCount, List<String> filesPaths) throws CustomException, InterruptedException {
         this.repeatedWords = new HashMap<>();
 
@@ -54,10 +41,34 @@ public class AnalyticsService {
         }
         executor.invokeAll(tasks);
 
-        return sortLinkedList(repeatedWords, topWordsCount);
+        return sortLinkedListAndGetTopCount(repeatedWords, topWordsCount);
     }
 
-    public LinkedHashMap<String, Integer> sortLinkedList(HashMap<String, Integer> repeatedWords, int topWordsCount) {
+    public void getAllWordsAndCount(String filePath) throws CustomException {
+
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(filePath), StandardCharsets.ISO_8859_1)) {
+            for (String line = null; (line = br.readLine()) != null; ) {
+
+                String[] lineInWords = line.toLowerCase().split("([()/!?,.\\s]+)");
+                addWordAndAddCount(lineInWords,repeatedWords);
+            }
+        } catch (IOException e) {
+            throw new CustomException(e);
+        }
+    }
+    public synchronized void addWordAndAddCount(String[] lineInWords ,HashMap<String, Integer> repeatedWords) {
+        for (String word : lineInWords) {
+            if (!word.isEmpty()) {
+                if (repeatedWords.containsKey(word.trim())) {
+                    Integer oldValue = repeatedWords.get(word.trim());
+                    repeatedWords.replace(word.trim(), oldValue + 1);
+                } else {
+                    repeatedWords.put(word.trim(), 1);
+                }
+            }
+        }
+    }
+    public LinkedHashMap<String, Integer> sortLinkedListAndGetTopCount(HashMap<String, Integer> repeatedWords, int topWordsCount) {
         LinkedHashMap<String, Integer> topWordsMap = new LinkedHashMap<>();
 
         Map<String, Integer> unSortedMap = repeatedWords;
@@ -79,37 +90,18 @@ public class AnalyticsService {
         return topWordsMap;
     }
 
-    public void getAllWordsAndCount(String filePath) throws CustomException {
 
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(filePath), StandardCharsets.ISO_8859_1)) {
-            for (String line = null; (line = br.readLine()) != null; ) {
 
-                String[] lineInWords = line.toLowerCase().split("([()/!?,.\\s]+)");
-                addWordAndAddCount(lineInWords,repeatedWords);
-            }
-        } catch (IOException e) {
-            throw new CustomException(e);
-        }
-    }
 
-    public synchronized void addWordAndAddCount(String[] lineInWords ,HashMap<String, Integer> repeatedWords) {
-        for (String word : lineInWords) {
-            if (!word.isEmpty()) {
-                if (repeatedWords.containsKey(word.trim())) {
-                    Integer oldValue = repeatedWords.get(word.trim());
-                    repeatedWords.replace(word.trim(), oldValue + 1);
-                } else {
-                    repeatedWords.put(word.trim(), 1);
-                }
-            }
-        }
-    }
+    //Used for reading line by line from other server and analysing it
+    private volatile HashMap<String, Integer> repeatedWordsConcat = new HashMap<>();
+    private volatile HashMap<String, Integer> repeatedWordsOneTimeConcat = new HashMap<>();
 
     public LinkedHashMap<String, Integer> topRepeatedCountWordsConcat(String line) {
 
         String[] lineInWords = line.toLowerCase().split("([()/!?,.\\s]+)");
         addWordAndAddCount(lineInWords,repeatedWordsConcat);
-        return sortLinkedList(repeatedWordsConcat, 5);
+        return sortLinkedListAndGetTopCount(repeatedWordsConcat, 5);
     }
 
 
@@ -117,6 +109,20 @@ public class AnalyticsService {
 
         String[] lineInWords = line.toLowerCase().split("([()/!?,.\\s]+)");
         addWordAndAddCount(lineInWords,repeatedWordsOneTimeConcat);
-        return sortLinkedList(repeatedWordsConcat, 5);
+        return sortLinkedListAndGetTopCount(repeatedWordsConcat, 5);
+    }
+
+    public LinkedHashMap<String, Integer> getRepeatedWordsConcat() {
+
+        return sortLinkedListAndGetTopCount(repeatedWordsConcat, 5);
+    }
+
+    public void setRepeatedWordsOneTimeConcat(HashMap<String, Integer> repeatedWordsOneTimeConcat) {
+        this.repeatedWordsOneTimeConcat = repeatedWordsOneTimeConcat;
+    }
+
+    public LinkedHashMap<String, Integer> repeatedWordsOneTimeConcat() {
+
+        return sortLinkedListAndGetTopCount(repeatedWordsOneTimeConcat, 5);
     }
 }
