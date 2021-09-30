@@ -49,7 +49,7 @@ public class AnalyticsController {
 
     //used by the client to transfer file line by line and analysing it
     @GetMapping("top-repeated-concat")
-    public ResponseEntity mostRepeatedWordsConcatCurrent(@RequestParam List<String> filesPaths) {
+    public ResponseEntity mostRepeatedWordsConcatCurrent() {
 
         return new ResponseEntity(analyticsService.getRepeatedWordsConcat(), HttpStatus.OK);
     }
