@@ -1,0 +1,32 @@
+server:
+  port: ${PORT:8080}
+  tomcat:
+    relaxed-query-chars: ['\']
+management:
+  endpoint:
+    health:
+      show-details: always
+
+spring:
+  thymeleaf:
+    cache: false
+
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+    time-zone: UTC
+    default-property-inclusion: non_empty
+    serialization:
+      write-empty-json-arrays: false
+      write-null-map-values: false
+      fail-on-empty-beans: false
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    parser:
+      allow-non-numeric-numbers: true
+    mapper:
+      default-view-inclusion: false
+
+props:
+  file-server-url: ${FILE_SERVER_URL:http://localhost:8001/}
+  read-path: ${READ_PATH:/api/read-files}
